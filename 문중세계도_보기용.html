@@ -1,0 +1,1265 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>문중 세계도 (보기용)</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* 레이아웃: 왼쪽 입력 패널 + 오른쪽 A4 종이 미리보기. 색은 쪽빛(남색) 하나만 쓰고, 종이는 테마와 상관없이 흰색 고정 */
+  --bg: #e9edf2;
+  --surface: #f6f8fb;
+  --raised: #ffffff;
+  --ink: #1b2230;
+  --muted: #586174;
+  --line: #cfd6e1;
+  --accent: #2a4a86;
+  --accent-ink: #ffffff;
+  --accent-soft: #dde6f6;
+  --warn: #9a4e12;
+  --warn-bg: #fbe9d6;
+  --ui: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --serif: "Noto Serif KR", "Batang", "AppleMyungjo", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1218; --surface: #181c25; --raised: #202531; --ink: #e6e9ef; --muted: #9aa3b5; --line: #323a4b;
+    --accent: #8fa9e0; --accent-ink: #0f1626; --accent-soft: #263250; --warn: #e6ac72; --warn-bg: #3a2c1c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1218; --surface: #181c25; --raised: #202531; --ink: #e6e9ef; --muted: #9aa3b5; --line: #323a4b;
+  --accent: #8fa9e0; --accent-ink: #0f1626; --accent-soft: #263250; --warn: #e6ac72; --warn-bg: #3a2c1c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.6 var(--ui);
+  padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1360px; margin: 0 auto; }
+h1 { font: 700 28px/1.2 var(--serif); margin: 0; text-wrap: balance; }
+h2 { font: 700 16px/1.3 var(--ui); margin: 0; }
+.lead { margin: 6px 0 0; color: var(--muted); }
+.top { margin-bottom: 18px; }
+.muted { color: var(--muted); font-weight: 400; }
+.app { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 920px) { .app { grid-template-columns: minmax(0, 1fr); } }
+.panel, .work { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 14px; min-width: 0; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.notice { display: flex; gap: 10px 14px; flex-wrap: wrap; align-items: center; background: var(--accent-soft); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; margin-bottom: 14px; }
+.notice p { margin: 0; flex: 1 1 260px; }
+
+.btn { min-height: 40px; padding: 0 14px; border: 1px solid var(--line); background: var(--raised); color: var(--ink); border-radius: 4px; font: inherit; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 500; }
+.btn.small { min-height: 34px; padding: 0 10px; font-size: 14px; }
+.btn[data-armed="1"] { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+:is(.btn, input, select, textarea, summary, .row):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+input[type="text"], input:not([type]), input[type="number"], select, textarea {
+  font: inherit; color: var(--ink); background: var(--raised); border: 1px solid var(--line); border-radius: 4px;
+  min-height: 40px; padding: 6px 10px; width: 100%; min-width: 0;
+}
+textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field > span, .seg legend { font-size: 13px; color: var(--muted); padding: 0; }
+
+.outline { max-height: 330px; overflow: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--raised); padding: 4px; }
+.row { display: flex; align-items: baseline; gap: 8px; width: 100%; min-width: max-content; text-align: left; min-height: 38px; padding: 4px 10px 4px calc(8px + var(--d) * 16px); border: 0; background: none; color: var(--ink); font: inherit; cursor: pointer; border-radius: 3px; white-space: nowrap; }
+.row:hover { background: color-mix(in srgb, var(--accent-soft) 55%, transparent); }
+.row[aria-pressed="true"] { background: var(--accent-soft); font-weight: 700; }
+.row .hj { font-family: var(--serif); color: var(--muted); font-weight: 400; }
+.row .gn { margin-left: auto; padding-left: 14px; color: var(--muted); font-size: 13px; font-weight: 400; }
+.row .tag { font-size: 12px; border: 1px solid var(--line); border-radius: 3px; padding: 0 5px; color: var(--muted); font-weight: 400; }
+.empty { padding: 14px 10px; color: var(--muted); }
+.search { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 10px; }
+.results { margin-top: 10px; }
+.results .rc { margin: 0 0 6px; font-size: 14px; color: var(--muted); }
+.results .rl { max-height: 260px; overflow: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--raised); }
+.res { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--line); padding: 2px 6px 2px 2px; }
+.res:last-child { border-bottom: 0; }
+.res .pick { flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; text-align: left; min-height: 40px; padding: 4px 8px; border: 0; background: none; color: var(--ink); font: inherit; cursor: pointer; border-radius: 3px; }
+.res .pick:hover { background: var(--accent-soft); }
+.res .pick b { font-weight: 700; }
+.res .pick .hj { font-family: var(--serif); color: var(--muted); }
+.res .pick .sub { color: var(--muted); font-size: 13px; }
+.res .go { flex: none; min-height: 34px; padding: 0 10px; font-size: 13px; }
+
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.form .span2 { grid-column: 1 / -1; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.seg { border: 0; margin: 0; padding: 0; min-width: 0; }
+.seg .opts { display: flex; margin-top: 4px; }
+.seg label { flex: 1 1 0; min-width: 0; position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; }
+.seg span { display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 8px; border: 1px solid var(--line); background: var(--raised); cursor: pointer; margin-left: -1px; text-align: center; }
+.seg label:first-child span { border-radius: 4px 0 0 4px; margin-left: 0; }
+.seg label:last-child span { border-radius: 0 4px 4px 0; }
+.seg input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; position: relative; }
+.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; align-items: end; }
+.check { display: flex; align-items: center; gap: 8px; min-height: 40px; cursor: pointer; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+details.card > summary { cursor: pointer; font-weight: 700; min-height: 32px; display: flex; align-items: center; }
+details.card[open] > summary { margin-bottom: 10px; }
+pre.ex { margin: 8px 0; padding: 10px 12px; background: var(--raised); border: 1px solid var(--line); border-radius: 4px; font: 13px/1.5 var(--ui); overflow: auto; }
+.viewonly .editonly { display: none !important; }
+.help { margin: 0 0 8px; color: var(--muted); font-size: 14px; }
+
+.status { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { border: 1px solid var(--line); background: var(--raised); border-radius: 999px; padding: 3px 12px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.chip.warn { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); font-weight: 700; }
+.msg { flex-basis: 100%; margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.msg.warn { color: var(--warn); }
+.printrow { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.printrow p { margin: 0; flex: 1 1 280px; font-size: 14px; color: var(--muted); }
+
+.sheets { display: flex; flex-direction: column; gap: 18px; min-width: 0; align-items: center; }
+.sheet { width: 100%; max-width: 1100px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25), 0 8px 22px rgba(0,0,0,.14); }
+.sheet.p { max-width: 720px; }
+.sheet svg { display: block; width: 100%; height: auto; font-family: var(--serif); }
+.placeholder { width: 100%; border: 1px dashed var(--line); border-radius: 4px; padding: 40px 20px; text-align: center; color: var(--muted); background: var(--surface); }
+
+@media print {
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
+  .top, .panel, .settings, .status, .printrow, .notice { display: none !important; }
+  .app { display: block; }
+  .work { display: block; }
+  .sheets { display: block; }
+  .sheet { width: var(--w) !important; max-width: none !important; height: var(--h); box-shadow: none; break-after: page; page-break-after: always; overflow: hidden; }
+  .sheet:last-child { break-after: auto; page-break-after: auto; }
+  .sheet svg { width: var(--w); height: var(--h); }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>문중 세계도</h1>
+    <p class="lead">인물을 찾고, A4 세계도·족보를 PDF나 인쇄로 뽑아요. 보기 전용이라 내용은 바꿀 수 없어요.</p>
+  </header>
+
+  <p id="modeBar" class="help" role="status" hidden style="margin:0 0 10px;font-weight:700"></p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 10px"><p id="viewInfo" class="help" role="status" style="margin:0;flex:1 1 320px"></p><button type="button" class="btn small" id="vPick">자료 파일 직접 고르기</button></div>
+  <div id="sampleBar" class="notice editonly" hidden>
+    <p>지금 들어 있는 인물은 <b>예시</b>예요. 이름은 가짜이니, 실제 인물을 입력하기 전에 지우고 시작하세요.</p>
+    <button type="button" class="btn" id="sampleClear">예시 지우고 새로 시작</button>
+    <button type="button" class="btn" id="sampleKeep">예시 그대로 두기</button>
+  </div>
+
+  <main class="app">
+    <section class="panel" aria-label="인물 입력">
+      <div class="card">
+        <h2 style="margin-bottom:10px">인물 찾기</h2>
+        <div class="search">
+          <label class="field"><span>이름 검색 (한글·한자, 일부만 써도 돼요)</span><input type="text" id="qName" placeholder="예: 정호" autocomplete="off"></label>
+          <label class="field"><span>○○세</span><input type="number" id="qGen" min="1" max="200" inputmode="numeric" placeholder="전체"></label>
+        </div>
+        <div id="results" class="results" hidden></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>인물 목록 <span id="count" class="muted"></span></h2>
+          <button type="button" class="btn small editonly" id="addRoot">+ 맨 위 인물 추가</button>
+        </div>
+        <div id="outline" class="outline" role="group" aria-label="인물 목록"></div>
+      </div>
+
+      <div class="card editonly">
+        <h2>선택한 인물 <span id="genTag" class="muted"></span></h2>
+        <p id="noSel" class="help" style="margin-top:8px">위 목록에서 인물을 누르면 여기서 고칠 수 있어요.</p>
+        <div id="form" class="form" hidden>
+          <label class="field"><span>이름</span><input type="text" id="fName" autocomplete="off"></label>
+          <label class="field"><span>한자 (선택)</span><input type="text" id="fHanja" autocomplete="off"></label>
+          <fieldset class="seg span2">
+            <legend>구분</legend>
+            <div class="opts">
+              <label><input type="radio" name="sex" value="M"><span>아들 (남)</span></label>
+              <label><input type="radio" name="sex" value="F"><span>딸 (여)</span></label>
+            </div>
+          </fieldset>
+          <label class="field"><span>태어난 해</span><input type="text" id="fBirth" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+          <label class="field"><span>돌아가신 해</span><input type="text" id="fDeath" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+          <label class="field span2"><span>메모 (호, 사는 곳, 묘소 등)</span><input type="text" id="fMemo" autocomplete="off"></label>
+          <div class="btns span2">
+            <button type="button" class="btn primary" id="bChild">+ 자녀 추가</button>
+            <button type="button" class="btn" id="bSib">+ 형제 추가</button>
+            <button type="button" class="btn" id="bUp" aria-label="형제 중 위로 올리기">▲ 위로</button>
+            <button type="button" class="btn" id="bDown" aria-label="형제 중 아래로 내리기">▼ 아래로</button>
+            <button type="button" class="btn" id="bDel">삭제</button>
+          </div>
+        </div>
+      </div>
+
+      <details class="card editonly" id="bulk">
+        <summary>여러 명을 한 번에 입력하기</summary>
+        <p class="help">한 줄에 한 명씩 쓰고, 자녀는 아버지보다 2칸 더 들여쓰세요. 엑셀이나 메모장에서 붙여넣어도 됩니다.</p>
+        <pre class="ex">홍길동(洪吉童) 1850-1920
+  홍판서 1880-1950
+    홍길수 1910-1985
+  홍진사 1884-1960
+  홍영희 1890-1970 딸</pre>
+        <textarea id="bText" aria-label="인물 목록 글" spellcheck="false"></textarea>
+        <div class="btns" style="margin-top:8px">
+          <button type="button" class="btn" id="bView">현재 목록을 글로 보기</button>
+          <button type="button" class="btn primary" id="bApply">이 글로 바꾸기</button>
+          <button type="button" class="btn" id="bCopy">복사</button>
+        </div>
+        <div class="btns" style="margin-top:8px">
+          <button type="button" class="btn" id="bSaveFile">자료를 파일(.txt)로 저장</button>
+          <button type="button" class="btn" id="bLoadFile">자료 파일 불러오기</button>
+          <input type="file" id="bFile" accept=".txt,text/plain" hidden>
+        </div>
+        <p class="help" style="margin:8px 0 0">내 컴퓨터 파일과 온라인(공유) 화면 사이는 이 자료 파일로 주고받아요. 한쪽에서 ‘파일로 저장’ → 다른 쪽에서 ‘불러오기’ → ‘이 글로 바꾸기’를 두 번 누르면 같아져요.</p>
+        <p class="help" id="bMsg" style="margin:8px 0 0"></p>
+      </details>
+    </section>
+
+    <section class="work" aria-label="세계도 출력">
+      <div class="card settings">
+        <label class="field editonly" style="grid-column:1/-1"><span>문중 이름 (제목에 들어가요)</span><input type="text" id="sTitle" placeholder="예: 경주 이씨 ○○공파" autocomplete="off"></label>
+        <label class="field editonly"><span>맨 위 인물은 몇 세인가요?</span><input type="number" id="sBase" min="1" max="200" inputmode="numeric"></label>
+        <label class="field"><span>출력 시작 인물</span><select id="sStart"></select></label>
+        <label class="field"><span>몇 세까지 보일까요? (비우면 전체)</span><input type="number" id="sDepth" min="1" max="60" inputmode="numeric" placeholder="전체"></label>
+        <label class="field"><span>위쪽 요약을 몇 세까지? (비우면 시작 인물 바로 윗대까지)</span><input type="number" id="sTopN" min="1" max="200" inputmode="numeric" placeholder="자동"></label>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <label class="check"><input type="checkbox" id="sShowF"><span>딸도 함께 표시</span></label>
+          <label class="check"><input type="checkbox" id="sTop"><span>윗대(1세~) 요약을 맨 앞 1쪽에 따로 넣기 (시작 인물을 고르면 나와요)</span></label>
+
+        </div>
+        <fieldset class="seg">
+          <legend>이름 표시 (한자가 없는 분은 한글로 나와요)</legend>
+          <div class="opts">
+            <label><input type="radio" name="nm" value="ko"><span>한글</span></label>
+            <label><input type="radio" name="nm" value="hj"><span>한자</span></label>
+            <label><input type="radio" name="nm" value="both"><span>한글+한자</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="seg">
+          <legend>세계도 장수 (가로 A4)</legend>
+          <div class="opts">
+            <label><input type="radio" name="sp" value="1"><span>1장</span></label>
+            <label><input type="radio" name="sp" value="2"><span>2장</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="seg">
+          <legend>출력 종류 (족보는 이름 오른쪽에 생-졸년·메모가 나와요)</legend>
+          <div class="opts">
+            <label><input type="radio" name="kind" value="S"><span>세계도</span></label>
+            <label><input type="radio" name="kind" value="J"><span>족보</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="seg">
+          <legend>용지 방향 (족보에만 적용, 세계도는 가로)</legend>
+          <div class="opts">
+            <label><input type="radio" name="orient" value="auto"><span>자동</span></label>
+            <label><input type="radio" name="orient" value="L"><span>가로</span></label>
+            <label><input type="radio" name="orient" value="P"><span>세로</span></label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div id="status" class="status" aria-live="polite"></div>
+      <div id="printRow" class="printrow"></div>
+      <div id="sheets" class="sheets"></div>
+    </section>
+  </main>
+</div>
+<style id="pagestyle"></style>
+
+<script src="문중_자료.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var fx = function (n) { return Math.round(n * 100) / 100; };
+
+  var SAMPLE_OLD = [
+    '이한수(李漢洙) 1620-1688',
+    '  이정호(李廷浩) 1645-1710',
+    '    이만석(李萬石) 1670-1735',
+    '      이기원 1695-1760',
+    '        이상우 1720-1790',
+    '          이재덕 1745-1810',
+    '            이한규 1770-1840',
+    '            이한식 1775-1845',
+    '          이재순 1750-1820',
+    '            이한철 1778-1850',
+    '        이상철 1724-1795',
+    '          이재형 1750-1815',
+    '      이기태 1700-1770',
+    '        이상민 1725-1790',
+    '          이재권 1752-1822',
+    '          이재영 1758-1830 딸',
+    '    이만복(李萬福) 1674-1740',
+    '      이기수 1698-1765',
+    '        이상진 1722-1788',
+    '          이재문 1748-1812',
+    '            이한준 1772-1841',
+    '            이한성 1776-1848',
+    '        이상현 1728-1800',
+    '      이기정 1703-1775',
+    '        이상호 1730-1801',
+    '  이정수(李廷秀) 1650-1720',
+    '    이만기(李萬基) 1675-1745',
+    '      이기영 1702-1770',
+    '        이상준 1727-1795',
+    '          이재호 1753-1820',
+    '          이재석 1757-1829',
+    '            이한영 1782-1850',
+    '        이상오 1731-1802',
+    '      이기석 1708-1778',
+    '        이상구 1735-1805',
+    '          이재중 1760-1830',
+    '    이만수(李萬秀) 1680-1750',
+    '      이기환 1705-1772',
+    '        이상덕 1730-1798',
+    '          이재건 1756-1825',
+    '          이재웅 1762-1833',
+    '            이한범 1788-1856',
+    '      이기운 1710-1780',
+    '        이상복 1736-1810',
+    '  이정철(李廷哲) 1655-1725',
+    '    이만길(李萬吉) 1682-1752',
+    '      이기성 1710-1778',
+    '        이상원 1738-1808',
+    '          이재필 1765-1835',
+    '    이만재 1688-1755',
+    '      이기윤 1715-1782',
+    '        이상태 1742-1812',
+    '          이재욱 1768-1838',
+    '          이재곤 1772-1842'
+  ].join('\n');
+
+  var SAMPLE = '';
+  var NODE_W = 22, SLOT = 30, LH = 15, FS = 13, GAPY = 34, PADX = 10, PADY = GAPY / 2, RAIL = 34, SMAX = 0.45;
+  var LS = 'munjung-sejaedo-v1';
+  var HAS_RT = !!(window.claude && window.claude.use);   /* claude.ai에 게시된 화면이면 true (내 컴퓨터에서 연 파일이면 false) */
+  var SHARED = HAS_RT;       /* 게시판: 자료를 서버(db)에 두고 관리자만 고쳐요 */
+  var VIEWONLY = true;      /* true면 입력·수정 화면을 숨겨요 */
+  var isAdmin = false, remoteReady = false;
+  var uid = 1;
+  var state = {
+    roots: [], sel: 0, sample: true, _idx: new Map(),
+    settings: { title: '(예시) 이씨 문중', baseGen: 1, startId: 0, depth: 0, showF: false, hanja: false, kind: 'S', top: true, topN: 0, nameMode: 'both', np: '1', orient: 'auto', pages: 'auto' }
+  };
+
+  /* ---------- 데이터 ---------- */
+  function mkNode(name) { return { id: uid++, name: name || '', hanja: '', sex: 'M', birth: '', death: '', memo: '', kids: [] }; }
+  function normalize(arr) {
+    return (arr || []).map(function (n) {
+      var m = mkNode(String(n.name || ''));
+      m.id = typeof n.id === 'number' ? n.id : m.id;
+      m.hanja = String(n.hanja || ''); m.sex = n.sex === 'F' ? 'F' : 'M';
+      m.birth = String(n.birth || ''); m.death = String(n.death || ''); m.memo = String(n.memo || '');
+      m.kids = normalize(n.kids);
+      return m;
+    });
+  }
+  function maxId(a) { var m = 0; a.forEach(function (n) { m = Math.max(m, n.id, maxId(n.kids)); }); return m; }
+  function indexAll() {
+    var map = new Map();
+    (function w(a, parent, d) { a.forEach(function (n, i) { map.set(n.id, { n: n, parent: parent, arr: a, i: i, d: d }); w(n.kids, n, d + 1); }); })(state.roots, null, 0);
+    return map;
+  }
+  function countAll(n) { return 1 + n.kids.reduce(function (s, k) { return s + countAll(k); }, 0); }
+
+  function parseText(text) {
+    var roots = [], stack = [];
+    parseText.meta = {};
+    text.split(/\r?\n/).forEach(function (raw) {
+      if (!raw.trim()) return;
+      if (raw.trim().charAt(0) === '#') {
+        var mt = raw.trim().slice(1).trim(), m1 = mt.match(/^제목\s*(.*)$/), m2 = mt.match(/^시작세\s*(\d+)/);
+        if (m1) parseText.meta.title = m1[1].trim();
+        if (m2 && +m2[1] >= 1) parseText.meta.baseGen = +m2[1];
+        return;
+      }
+      var indent = raw.match(/^[\t ]*/)[0].replace(/\t/g, '  ').length;
+      var line = raw.trim();
+      var mm = line.match(/^([^\s(（]+)\s*(?:[(（]([^)）]*)[)）])?\s*(.*)$/);
+      if (!mm) return;
+      var n = mkNode(mm[1]); n.hanja = (mm[2] || '').trim();
+      var memo = [];
+      (mm[3] || '').split(/\s+/).filter(Boolean).forEach(function (t) {
+        var ym = t.match(/^(\d{3,4})?[-~–](\d{3,4})?$/);
+        if (ym) { n.birth = ym[1] || ''; n.death = ym[2] || ''; }
+        else if (t === '딸' || t === '여') n.sex = 'F';
+        else if (t === '아들' || t === '남') n.sex = 'M';
+        else memo.push(t);
+      });
+      n.memo = memo.join(' ');
+      while (stack.length && stack[stack.length - 1].indent >= indent) stack.pop();
+      if (stack.length) stack[stack.length - 1].n.kids.push(n); else roots.push(n);
+      stack.push({ indent: indent, n: n });
+    });
+    return roots;
+  }
+  function toText() {
+    var out = [];
+    if ((state.settings.title || '').trim()) out.push('#제목 ' + state.settings.title.trim());
+    out.push('#시작세 ' + state.settings.baseGen);
+    (function w(a, d) {
+      a.forEach(function (n) {
+        var s = '  '.repeat(d) + (n.name.replace(/\s+/g, '') || '이름없음') + (n.hanja ? '(' + n.hanja + ')' : '');
+        if (n.birth || n.death) s += ' ' + (n.birth || '') + '-' + (n.death || '');
+        if (n.sex === 'F') s += ' 딸';
+        if (n.memo) s += ' ' + n.memo;
+        out.push(s); w(n.kids, d + 1);
+      });
+    })(state.roots, 0);
+    return out.join('\n');
+  }
+
+  function save() {
+    if (SHARED) { scheduleRemote(); return; }
+    if (VIEWONLY) return;
+    try { localStorage.setItem(LS, JSON.stringify({ roots: state.roots, settings: state.settings, sample: state.sample })); } catch (e) { /* 저장 불가 환경 */ }
+  }
+  function load() {
+    return loadFromDataFile();
+    try {
+      var raw = localStorage.getItem(LS); if (!raw) return false;
+      var d = JSON.parse(raw); if (!d || !Array.isArray(d.roots)) return false;
+      state.roots = normalize(d.roots); Object.assign(state.settings, d.settings || {}); state.sample = !!d.sample;
+      uid = maxId(state.roots) + 1; return true;
+    } catch (e) { return false; }
+  }
+
+  /* ---------- 배치 계산 ---------- */
+  function disp(n) {
+    var st = state.settings;
+    var s = n.name.replace(/\s+/g, '');
+    return Array.from(s || '?').slice(0, 6);
+  }
+  /* 세계도: 위에서 아래로 세(世)가 내려가요. 아버지 바로 아래에 첫째 아들, 둘째부터는 오른쪽으로 차례로 놓여요.
+     이름 글자는 항상 11pt로 고정이에요. 세계도는 간격을 가장 좁게 해서 되도록 한 장에, 족보는 넉넉한 간격으로 필요한 만큼 여러 장에 나눠요.
+     그림은 항상 용지 왼쪽 위에서 시작해요. */
+  var ILH = 7.8, IFS = 7, ILW = 8.4, KMIN = 10, MAXMEMO = 4;
+  var NAMEBORDER = '#b9c1cf', FSH = 11.5, LHH = 12.6, EXM = 22;
+  var SFIX = 11 * 25.4 / 72 / FS;            /* 이름 글자를 용지 위에서 11pt로 만드는 배율 */
+
+  function yearStr(n) {
+    var b = n.birth, d = n.death;
+    if (b && d) return b + '-' + d;
+    if (b) return b + '-';
+    if (d) return '-' + d;
+    return '';
+  }
+  function mainChars(n) {
+    var hz = hjChars(n);
+    return state.settings.nameMode === 'hj' && hz.length ? hz : disp(n);
+  }
+  function hjChars(n) { return Array.from((n.hanja || '').replace(/\s+/g, '')).slice(0, 6); }
+
+  /* 위쪽 윗대 요약 줄: 1세부터 시작 인물 바로 윗대(또는 고른 ○세)까지, 세와 이름만 가로로 */
+  function stripLayout(L, PW, big) {
+    var cnt = L.strip.length;
+    if (!cnt) return { stripH: 0 };
+    var cw = PW - 20, per = Math.max(1, Math.floor((cw + 1) / 10)), perUsed = Math.min(cnt, per), rowsN = Math.ceil(cnt / per);
+    var cellW = Math.min(big ? 18 : 12, (cw - (perUsed - 1)) / perUsed), fs = Math.min(big ? 4.4 : 3.88, cellW * 0.42), lh = fs * 1.15;
+    var maxC = 1; L.strip.forEach(function (c) { maxC = Math.max(maxC, c.chars.length); });
+    var labelH = 5, nameBlock = 2.4 + maxC * lh, cellH = labelH + 0.6 + nameBlock, rowGap = 2;
+    return { per: per, rowsN: rowsN, cellW: cellW, fs: fs, lh: lh, labelH: labelH, nameBlock: nameBlock, cellH: cellH, rowGap: rowGap,
+      stripH: rowsN * cellH + (rowsN - 1) * rowGap + 4 };
+  }
+
+  function computeLayout() {
+    var st = state.settings, idx = state._idx, roots, startDepth = 0, start = null;
+    if (st.startId && idx.get(st.startId)) { start = idx.get(st.startId); roots = [start.n]; startDepth = start.d; }
+    else roots = state.roots;
+    if (!roots.length) return null;
+    var maxRel = st.depth > 0 ? st.depth - 1 : Infinity, nodes = [], rootsV = [];
+    function build(n, rel, parentV) {
+      var v = { n: n, rel: rel, kids: [], cut: false, x: 0, parent: parentV || null };
+      nodes.push(v);
+      var shown = n.kids.filter(function (c) { return st.showF || c.sex !== 'F'; });
+      if (rel < maxRel) shown.forEach(function (c) { v.kids.push(build(c, rel + 1, v)); });
+      else if (shown.length) v.cut = true;
+      return v;
+    }
+    roots.forEach(function (r) { rootsV.push(build(r, 0, null)); });
+
+    var jok = st.kind === 'J', tight = !jok;      /* 세계도는 간격을 가장 좁게, 족보는 넉넉하게 */
+    var LHn = tight ? 13.6 : 15, padN = tight ? 6 : 10, gapY = tight ? 20 : 34, slotGap = tight ? 3 : 8;
+    var rows = 0, cH = 2, cJ = 0, anyHanja = false;
+    nodes.forEach(function (v) {
+      var hz = hjChars(v.n), nm = st.nameMode || 'both';
+      v.hn = mainChars(v.n); v.hj = nm === 'both' ? hz : [];
+      rows = Math.max(rows, v.rel + 1); cH = Math.max(cH, v.hn.length); cJ = Math.max(cJ, v.hj.length);
+      if (v.hj.length) anyHanja = true;
+    });
+    var boxW = anyHanja ? 32 : 22;
+    var nameH = padN + Math.max(cH * LHn, cJ * LHH), K = jok ? Math.max(KMIN, Math.ceil(nameH / ILH)) : 0;
+    var anyYears = false, memoCols = 0;
+    if (jok) nodes.forEach(function (v) {
+      var ys = yearStr(v.n), mc = Array.from((v.n.memo || '').replace(/\s+/g, ''));
+      if (mc.length > MAXMEMO * K) mc = mc.slice(0, MAXMEMO * K - 1).concat(['…']);
+      v.years = Array.from(ys); v.memoCols = [];
+      for (var i = 0; i < mc.length; i += K) v.memoCols.push(mc.slice(i, i + K));
+      if (ys) anyYears = true;
+      memoCols = Math.max(memoCols, v.memoCols.length);
+    });
+    var infoCols = (anyYears ? 1 : 0) + memoCols, infoW = infoCols ? infoCols * ILW + 3 : 0;
+    var blockH = infoCols ? Math.max(nameH, K * ILH + 2) : nameH;
+    var slotW = boxW + infoW + slotGap;
+
+    var leaf = 0;
+    function place(v) {
+      if (!v.kids.length) { v.x = leaf * slotW; leaf += 1; }
+      else { v.kids.forEach(place); v.x = v.kids[0].x; }
+    }
+    rootsV.forEach(function (r, i) { if (i > 0) leaf += 0.6; place(r); });
+    var minX = Infinity, maxX = -Infinity;
+    nodes.forEach(function (v) {
+      minX = Math.min(minX, v.x - boxW / 2); maxX = Math.max(maxX, v.x + boxW / 2 + infoW);
+    });
+    var rowH = blockH + gapY;
+
+    var strip = [];
+    if (st.top && start) {
+      var info = start, chain = [];
+      while (info.parent) { info = idx.get(info.parent.id); if (!info) break; chain.unshift(info); }
+      chain.forEach(function (a) {
+        var gen = st.baseGen + a.d;
+        if (st.topN > 0 && gen > st.topN) return;
+        strip.push({ gen: gen, chars: mainChars(a.n) });
+      });
+    }
+    return { strip: strip, nodes: nodes, rootsV: rootsV, rows: rows, boxW: boxW, anyHanja: anyHanja, nameH: nameH, blockH: blockH, LHn: LHn,
+      gapY: gapY, padY: gapY / 2, rowH: rowH, K: K, jok: jok, anyYears: anyYears, infoW: infoW, minX: minX, maxX: maxX,
+      gen0: st.baseGen + startDepth, start: start };
+  }
+
+  /* ---------- 쪽 나누기 (글자 크기는 11pt 고정, 모자라면 쪽을 늘려요) ---------- */
+  function xCuts(L, capW) {
+    var xs = Array.from(new Set(L.nodes.map(function (v) { return fx(v.x); }))).sort(function (a, b) { return a - b; });
+    var cands = [];
+    for (var k = 0; k < xs.length - 1; k++) {
+      var rightK = xs[k] + L.boxW / 2 + L.infoW, leftNext = xs[k + 1] - L.boxW / 2;
+      if (leftNext - rightK >= 2) cands.push((rightK + leftNext) / 2);
+    }
+    var bounds = [], start = L.minX;
+    while (L.maxX - start > capW) {
+      var pick = null;
+      for (var i = 0; i < cands.length; i++) {
+        if (cands[i] <= start + 1) continue;
+        if (cands[i] - start <= capW) pick = cands[i]; else { if (!pick) pick = cands[i]; break; }
+      }
+      if (pick === null) break;
+      bounds.push(pick); start = pick;
+    }
+    return bounds;
+  }
+  function planTiles(L, o) {
+    var PW = o === 'L' ? 297 : 210, PH = o === 'L' ? 210 : 297, cw = PW - 20, ch = PH - 40, s = SFIX;
+    var SL = { stripH: 0 };
+    var bounds = xCuts(L, cw / s - RAIL - PADX);
+    var rowsFirst = Math.max(1, Math.floor(((ch - SL.stripH) / s - L.padY / 2) / L.rowH));
+    var rowsRest = Math.max(1, Math.floor((ch / s - EXM) / L.rowH));
+    var chunks = [], r = 0;
+    while (r < L.rows) { var n = r === 0 ? rowsFirst : rowsRest; chunks.push([r, Math.min(L.rows, r + n)]); r += n; }
+    var C = bounds.length + 1, tiles = [];
+    chunks.forEach(function (rc) {
+      for (var xi = 0; xi < C; xi++) {
+        var xa = xi ? bounds[xi - 1] : -Infinity, xb = xi < C - 1 ? bounds[xi] : Infinity;
+        var has = L.nodes.some(function (v) {
+          return v.rel >= rc[0] && v.rel < rc[1] && v.x + L.boxW / 2 + L.infoW > xa && v.x - L.boxW / 2 < xb;
+        });
+        if (has) tiles.push({ xi: xi, r0: rc[0], r1: rc[1], xa: xa, xb: xb });
+      }
+    });
+    return { o: o, PW: PW, PH: PH, cw: cw, ch: ch, s: s, SL: SL, bounds: bounds, C: C, tiles: tiles, pages: tiles.length };
+  }
+  function bestCut2(L) {
+    var xs = Array.from(new Set(L.nodes.map(function (v) { return fx(v.x); }))).sort(function (a, b) { return a - b; });
+    var total = L.maxX - L.minX, best = null;
+    for (var k = 0; k < xs.length - 1; k++) {
+      var rightK = xs[k] + L.boxW / 2 + L.infoW, leftNext = xs[k + 1] - L.boxW / 2;
+      if (leftNext - rightK < 2) continue;
+      var b = (rightK + leftNext) / 2;
+      if (b < L.minX + total * 0.15 || b > L.minX + total * 0.85) continue;
+      var cross = L.nodes.filter(function (v) { return v.kids.length > 1 && v.kids[0].x < b && v.kids[v.kids.length - 1].x > b; }).length;
+      var wa = b - L.minX, wb = L.maxX - b, score = Math.max(wa, wb) + cross * L.boxW * 0.6;
+      if (!best || score < best.score) best = { b: b, score: score, wa: wa, wb: wb };
+    }
+    return best;
+  }
+  function planFit(L) {
+    var st = state.settings, PW = 297, PH = 210, cw = PW - 20, ch = PH - 40, SL = { stripH: 0 };
+    var Ht = L.rows * L.rowH, chEff = ch - SL.stripH, W1 = (L.maxX - L.minX) + PADX + RAIL;
+    var cut = st.np === '2' ? bestCut2(L) : null, s, bounds = [], tiles;
+    if (cut) {
+      s = Math.min(cw / (Math.max(cut.wa, cut.wb) + PADX + RAIL), chEff / Ht, SMAX); bounds = [cut.b];
+      tiles = [{ xi: 0, r0: 0, r1: L.rows, xa: -Infinity, xb: cut.b }, { xi: 1, r0: 0, r1: L.rows, xa: cut.b, xb: Infinity }];
+    } else {
+      s = Math.min(cw / W1, chEff / Ht, SMAX);
+      tiles = [{ xi: 0, r0: 0, r1: L.rows, xa: -Infinity, xb: Infinity }];
+    }
+    return { o: 'L', PW: PW, PH: PH, cw: cw, ch: ch, s: s, SL: SL, bounds: bounds, C: bounds.length + 1, tiles: tiles, pages: tiles.length };
+  }
+  function plan(L) {
+    return L.jok ? planTilesAuto(L) : planFit(L);
+  }
+  function planTilesAuto(L) {
+    var st = state.settings, orients = st.orient === 'auto' ? ['L', 'P'] : [st.orient];
+    var best = null;
+    orients.forEach(function (o) { var p = planTiles(L, o); if (!best || p.pages < best.pages) best = p; });
+    return best;
+  }
+
+  /* ---------- 그리기 ---------- */
+  function vtext(chars, cx, top, lh, fs, fill, weight) {
+    var h = '';
+    chars.forEach(function (c, j) {
+      h += '<text x="' + fx(cx) + '" y="' + fx(top + (j + 0.5) * lh) + '" text-anchor="middle" dominant-baseline="central" font-size="' + fs + '"' + (weight ? ' font-weight="' + weight + '"' : '') + ' fill="' + fill + '">' + esc(c) + '</text>';
+    });
+    return h;
+  }
+  function summaryPageSvg(L, P) {
+    var st = state.settings, SL = stripLayout(L, P.PW, true), total = P.tiles.length + 1;
+    var kindName = L.jok ? '족보' : '세계도', kindHanja = L.jok ? '族譜' : '世系圖', title = (st.title || '').trim();
+    var last = L.strip[L.strip.length - 1], startName = L.start ? L.start.n.name.trim() : '';
+    var d = new Date(), date = d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate() + '.';
+    var h = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + P.PW + ' ' + P.PH + '" role="img" aria-label="윗대 요약">';
+    h += '<rect width="' + P.PW + '" height="' + P.PH + '" fill="#fff"/>';
+    h += '<text x="10" y="16" font-size="5.6" font-weight="700" fill="#141821">' + esc((title ? title + ' ' : '') + kindName) + '<tspan font-size="4" font-weight="500" fill="#586174" dx="2.5">' + kindHanja + '</tspan></text>';
+    h += '<text x="10" y="21" font-size="2.9" fill="#586174">' + esc('윗대 요약 · ' + L.strip[0].gen + '세 ~ ' + last.gen + '세') + '</text>';
+    h += '<text x="' + (P.PW - 10) + '" y="16" text-anchor="end" font-size="3.6" fill="#586174">1 / ' + total + '</text>';
+    h += '<line x1="10" x2="' + (P.PW - 10) + '" y1="23.2" y2="23.2" stroke="#1b1f27" stroke-width=".4"/>';
+    L.strip.forEach(function (c, k) {
+      var col = k % SL.per, row = Math.floor(k / SL.per);
+      var x = 10 + col * (SL.cellW + 1), y = 30 + row * (SL.cellH + SL.rowGap);
+      h += '<rect x="' + fx(x) + '" y="' + fx(y) + '" width="' + fx(SL.cellW) + '" height="' + SL.labelH + '" rx=".8" fill="#e4eaf5" stroke="#b9c1cf" stroke-width=".3"/>';
+      h += '<text x="' + fx(x + SL.cellW / 2) + '" y="' + fx(y + SL.labelH / 2) + '" text-anchor="middle" dominant-baseline="central" font-size="3" font-weight="700" fill="#3c4658">' + c.gen + '세</text>';
+      h += '<rect x="' + fx(x) + '" y="' + fx(y + SL.labelH + 0.6) + '" width="' + fx(SL.cellW) + '" height="' + fx(SL.nameBlock) + '" rx=".8" fill="#fff" stroke="#b9c1cf" stroke-width=".3"/>';
+      var top = y + SL.labelH + 0.6 + (SL.nameBlock - c.chars.length * SL.lh) / 2;
+      c.chars.forEach(function (ch, j) {
+        h += '<text x="' + fx(x + SL.cellW / 2) + '" y="' + fx(top + (j + 0.5) * SL.lh) + '" text-anchor="middle" dominant-baseline="central" font-size="' + fx(SL.fs) + '" font-weight="700" fill="#141821">' + esc(ch) + '</text>';
+      });
+    });
+    h += '<text x="10" y="' + fx(30 + SL.stripH + 6) + '" font-size="3.6" fill="#3c4658">' + esc('다음 장부터 ' + startName + ' (' + L.gen0 + '세) 이하 ' + kindName + '가 이어져요.') + '</text>';
+    h += '<text x="10" y="' + (P.PH - 6) + '" font-size="2.6" fill="#8a93a5">작성 ' + date + '</text>';
+    return h + '</svg>';
+  }
+  function pageSvg(L, P, ti) {
+    var st = state.settings, T = P.tiles[ti], total = P.tiles.length, s = P.s, SL = P.SL, first = ti === 0, cont = T.r0 > 0;
+    var x0 = T.xi === 0 ? L.minX - PADX - RAIL : T.xa - RAIL;
+    var x1 = T.xi === P.C - 1 ? L.maxX + PADX : T.xb;
+    var cx0 = T.xi === 0 ? x0 : T.xa, cx1 = x1;
+    var yA = T.r0 === 0 ? 0 : T.r0 * L.rowH + L.padY / 2;
+    var yB = T.r1 >= L.rows ? L.rows * L.rowH : T.r1 * L.rowH + L.padY / 2;
+    var vy = yA - (cont ? EXM : 0);
+    var tw = (x1 - x0) * s, th = (yB - vy) * s, tx = 10, ty = 26 + (first ? SL.stripH : 0);
+    var rowTop = function (r) { return L.padY + r * L.rowH; };
+    var kindName = L.jok ? '족보' : '세계도', kindHanja = L.jok ? '族譜' : '世系圖';
+    var title = (st.title || '').trim();
+    var sub = [];
+    if (L.start) sub.push(disp(L.start.n).join('') + ' 이하');
+    sub.push(L.gen0 + '세 ~ ' + (L.gen0 + L.rows - 1) + '세');
+    sub.push(L.nodes.length + '명');
+    sub.push(st.showF ? '딸 포함' : '아들 계통');
+    var d = new Date(), date = d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate() + '.';
+    var uid = 'c' + ti;
+
+    var h = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + P.PW + ' ' + P.PH + '" role="img" aria-label="' + kindName + ' ' + (ti + 1) + '면">';
+    h += '<rect width="' + P.PW + '" height="' + P.PH + '" fill="#fff"/>';
+    h += '<text x="10" y="16" font-size="5.6" font-weight="700" fill="#141821">' + esc((title ? title + ' ' : '') + kindName) + '<tspan font-size="4" font-weight="500" fill="#586174" dx="2.5">' + kindHanja + '</tspan></text>';
+    h += '<text x="10" y="21" font-size="2.9" fill="#586174">' + esc(sub.join('  ·  ')) + '</text>';
+    if (total + (P.off || 0) > 1) h += '<text x="' + (P.PW - 10) + '" y="16" text-anchor="end" font-size="3.6" fill="#586174">' + (ti + 1 + (P.off || 0)) + ' / ' + (total + (P.off || 0)) + '</text>';
+    h += '<line x1="10" x2="' + (P.PW - 10) + '" y1="23.2" y2="23.2" stroke="#1b1f27" stroke-width=".4"/>';
+    (first ? L.strip : []).forEach(function (c, k) {
+      var col = k % SL.per, row = Math.floor(k / SL.per);
+      var x = 10 + col * (SL.cellW + 1), y = 26 + row * (SL.cellH + SL.rowGap);
+      h += '<rect x="' + fx(x) + '" y="' + fx(y) + '" width="' + fx(SL.cellW) + '" height="' + SL.labelH + '" rx=".8" fill="#e4eaf5" stroke="#b9c1cf" stroke-width=".3"/>';
+      h += '<text x="' + fx(x + SL.cellW / 2) + '" y="' + fx(y + SL.labelH / 2) + '" text-anchor="middle" dominant-baseline="central" font-size="3" font-weight="700" fill="#3c4658">' + c.gen + '세</text>';
+      h += '<rect x="' + fx(x) + '" y="' + fx(y + SL.labelH + 0.6) + '" width="' + fx(SL.cellW) + '" height="' + fx(SL.nameBlock) + '" rx=".8" fill="#fff" stroke="#b9c1cf" stroke-width=".3"/>';
+      var top = y + SL.labelH + 0.6 + (SL.nameBlock - c.chars.length * SL.lh) / 2;
+      c.chars.forEach(function (ch, j) {
+        h += '<text x="' + fx(x + SL.cellW / 2) + '" y="' + fx(top + (j + 0.5) * SL.lh) + '" text-anchor="middle" dominant-baseline="central" font-size="' + fx(SL.fs) + '" font-weight="700" fill="#141821">' + esc(ch) + '</text>';
+      });
+    });
+    h += '<svg x="' + fx(tx) + '" y="' + fx(ty) + '" width="' + fx(tw) + '" height="' + fx(th) + '" viewBox="' + fx(x0) + ' ' + fx(vy) + ' ' + fx(x1 - x0) + ' ' + fx(yB - vy) + '">';
+    h += '<defs><clipPath id="b' + uid + '"><rect x="' + fx(x0) + '" y="' + fx(yA) + '" width="' + fx(x1 - x0) + '" height="' + fx(yB - yA) + '"/></clipPath>' +
+      '<clipPath id="' + uid + '"><rect x="' + fx(cx0) + '" y="' + fx(yA) + '" width="' + fx(cx1 - cx0) + '" height="' + fx(yB - yA) + '"/></clipPath></defs>';
+
+    h += '<g clip-path="url(#b' + uid + ')">';
+    for (var r = T.r0; r < T.r1; r++) {
+      if (r % 2 === 0) h += '<rect x="' + fx(x0) + '" y="' + fx(r * L.rowH) + '" width="' + fx(x1 - x0) + '" height="' + fx(L.rowH) + '" fill="#f2f4f7"/>';
+      h += '<text x="' + fx(x0 + RAIL / 2 - 1) + '" y="' + fx(rowTop(r) + L.nameH / 2) + '" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="700" fill="#4a5262">' + (L.gen0 + r) + '세</text>';
+    }
+    h += '<line x1="' + fx(x0 + RAIL - 2) + '" x2="' + fx(x0 + RAIL - 2) + '" y1="' + fx(yA) + '" y2="' + fx(yB) + '" stroke="#c4cad6" stroke-width=".6"/>';
+    h += '</g>';
+
+    var dpath = '';
+    L.nodes.forEach(function (v) {
+      if (!v.kids.length || v.rel < T.r0 || v.rel >= T.r1) return;
+      var y0 = rowTop(v.rel) + L.nameH, y1 = rowTop(v.rel + 1), ym = rowTop(v.rel) + L.blockH + L.gapY / 2;
+      if (v.kids.length === 1) dpath += 'M' + fx(v.x) + ' ' + fx(y0) + 'V' + fx(y1);
+      else {
+        dpath += 'M' + fx(v.x) + ' ' + fx(y0) + 'V' + fx(ym) + 'M' + fx(v.kids[0].x) + ' ' + fx(ym) + 'H' + fx(v.kids[v.kids.length - 1].x);
+        v.kids.forEach(function (k) { dpath += 'M' + fx(k.x) + ' ' + fx(ym) + 'V' + fx(y1); });
+      }
+    });
+    h += '<g clip-path="url(#' + uid + ')">';
+    h += '<path d="' + dpath + '" fill="none" stroke="#1b1f27" stroke-width=".8"/>';
+    L.nodes.forEach(function (v) {
+      if (v.rel < T.r0 || v.rel >= T.r1) return;
+      if (v.x + L.boxW / 2 + L.infoW < cx0 || v.x - L.boxW / 2 > cx1) return;
+      var top = rowTop(v.rel), left = v.x - L.boxW / 2;
+      h += '<rect x="' + fx(left) + '" y="' + fx(top) + '" width="' + L.boxW + '" height="' + fx(L.nameH) + '" fill="#fff" stroke="' + NAMEBORDER + '" stroke-width=".5"' + (v.n.sex === 'F' ? ' stroke-dasharray="3 2"' : '') + '/>';
+      if (v.hj.length) {
+        h += vtext(v.hn, left + 9.5, top + (L.nameH - v.hn.length * L.LHn) / 2, L.LHn, FS, '#141821', 700);
+        h += vtext(v.hj, left + L.boxW - 9, top + (L.nameH - v.hj.length * LHH) / 2, LHH, FSH, '#3a4252', 300);
+      } else {
+        h += vtext(v.hn, v.x, top + (L.nameH - v.hn.length * L.LHn) / 2, L.LHn, FS, '#141821', 700);
+      }
+      if (L.jok) {
+        var ix = left + L.boxW + 3 + ILW / 2, ci = 0;
+        if (L.anyYears) { h += vtext(v.years, ix, top + 1, ILH, IFS, '#2c3444', null); ci = 1; }
+        v.memoCols.forEach(function (col, k) { h += vtext(col, ix + (ci + k) * ILW, top + 1, ILH, IFS, '#3a4252', null); });
+      }
+      if (v.cut) for (var k = 0; k < 3; k++) h += '<circle cx="' + fx(v.x) + '" cy="' + fx(top + L.blockH + 6 + k * 5) + '" r="1.2" fill="#586174"/>';
+    });
+    h += '</g>';
+
+    /* 앞 면에서 이어지는 가지: 위쪽 여백에 아버지 이름을 적어요 */
+    if (cont) {
+      var groups = [];
+      L.nodes.forEach(function (v) {
+        if (v.rel !== T.r0 || !v.parent) return;
+        if (v.x + L.boxW / 2 + L.infoW < cx0 || v.x - L.boxW / 2 > cx1) return;
+        var g = groups.filter(function (q) { return q.p === v.parent; })[0];
+        if (!g) { g = { p: v.parent, kids: [] }; groups.push(g); }
+        g.kids.push(v);
+      });
+      var yh = yA - 6, cpath = '';
+      groups.forEach(function (g) {
+        var k0 = g.kids[0], kN = g.kids[g.kids.length - 1];
+        cpath += 'M' + fx(k0.x) + ' ' + fx(yh - 4) + 'V' + fx(yh) + 'M' + fx(k0.x) + ' ' + fx(yh) + 'H' + fx(kN.x);
+        g.kids.forEach(function (k) { cpath += 'M' + fx(k.x) + ' ' + fx(yh) + 'V' + fx(rowTop(T.r0)); });
+        h += '<text x="' + fx(k0.x - L.boxW / 2) + '" y="' + fx(yh - 8) + '" font-size="6.5" fill="#586174" paint-order="stroke" stroke="#fff" stroke-width="2.4" stroke-linejoin="round">↑ 아버지 ' + esc(g.p.hn.join('')) + '</text>';
+      });
+      h += '<path d="' + cpath + '" fill="none" stroke="#1b1f27" stroke-width=".8"/>';
+    }
+
+    /* 오른쪽·왼쪽 면으로 이어지는 형제 줄 표시 */
+    var bR = T.xi < P.C - 1 ? T.xb : null, bL = T.xi > 0 ? T.xa : null;
+    var common = ' font-size="7" fill="#586174" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round"';
+    L.nodes.forEach(function (v) {
+      if (v.kids.length < 2 || v.rel < T.r0 || v.rel >= T.r1) return;
+      var ym = rowTop(v.rel) + L.blockH + L.gapY / 2, k0 = v.kids[0].x, kN = v.kids[v.kids.length - 1].x;
+      if (bR !== null && k0 < bR && kN > bR) h += '<text x="' + fx(bR - 2) + '" y="' + fx(ym - 2.5) + '" text-anchor="end"' + common + '>다음 면 ›</text>';
+      if (bL !== null && k0 < bL && kN > bL) h += '<text x="' + fx(bL + 2) + '" y="' + fx(ym - 2.5) + '" text-anchor="start"' + common + '>‹ 아버지 ' + esc(v.hn.join('')) + '</text>';
+    });
+
+    h += '</svg>';
+    h += '<text x="10" y="' + (P.PH - 6) + '" font-size="2.6" fill="#8a93a5">작성 ' + date + '</text>';
+    h += '</svg>';
+    return h;
+  }
+
+  var FRAMED = (function () { try { return window.top !== window; } catch (e) { return true; } })();
+  var lastRender = null;
+  var DL = null;   /* 게시된 화면에서 파일 저장을 허락받는 기능 (없으면 null) */
+  if (FRAMED && window.claude && window.claude.use) {
+    window.claude.use('downloads').then(function (d) { if (d) { DL = d; if (lastRender) renderSheets(); } }, function () {});
+  }
+
+
+  /* ---------- PDF 파일 만들기 (프로그램 없이 직접 조립) ---------- */
+  function pageToJpeg(svg, P) {
+    return new Promise(function (resolve, reject) {
+      var dpi = 250, W = Math.round(P.PW / 25.4 * dpi), H = Math.round(P.PH / 25.4 * dpi);
+      var fam = "'Noto Serif KR','Batang','AppleMyungjo','Nanum Myeongjo','Malgun Gothic','Apple SD Gothic Neo',serif";
+      var src = svg.replace('<svg xmlns="http://www.w3.org/2000/svg"', '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" font-family="' + fam + '"');
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var c = document.createElement('canvas'); c.width = W; c.height = H;
+          var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.drawImage(img, 0, 0, W, H);
+          c.toBlob(function (b) {
+            if (!b) { reject(new Error('jpeg')); return; }
+            b.arrayBuffer().then(function (buf) { resolve({ data: new Uint8Array(buf), w: W, h: H }); }, reject);
+          }, 'image/jpeg', 0.92);
+        } catch (e) { reject(e); }
+      };
+      img.onerror = function () { reject(new Error('svg')); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(src);
+    });
+  }
+  function buildPdf(jpegs, ptW, ptH) {
+    var enc = new TextEncoder(), chunks = [], offs = [], len = 0, n = jpegs.length, N = 2 + 3 * n;
+    function push(b) { if (typeof b === 'string') b = enc.encode(b); chunks.push(b); len += b.length; }
+    function obj(num, dict, stream) {
+      offs[num] = len; push(num + ' 0 obj\n' + dict);
+      if (stream) { push('\nstream\n'); push(stream); push('\nendstream'); }
+      push('\nendobj\n');
+    }
+    push('%PDF-1.4\n');
+    obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    var kids = []; for (var i = 0; i < n; i++) kids.push((3 + 3 * i) + ' 0 R');
+    obj(2, '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + n + ' >>');
+    jpegs.forEach(function (j, i) {
+      var pg = 3 + 3 * i, ct = 4 + 3 * i, im = 5 + 3 * i;
+      var content = enc.encode('q ' + ptW.toFixed(2) + ' 0 0 ' + ptH.toFixed(2) + ' 0 0 cm /Im0 Do Q');
+      obj(pg, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + ptW.toFixed(2) + ' ' + ptH.toFixed(2) + '] /Resources << /XObject << /Im0 ' + im + ' 0 R >> >> /Contents ' + ct + ' 0 R >>');
+      obj(ct, '<< /Length ' + content.length + ' >>', content);
+      obj(im, '<< /Type /XObject /Subtype /Image /Width ' + j.w + ' /Height ' + j.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + j.data.length + ' >>', j.data);
+    });
+    var xref = len;
+    push('xref\n0 ' + (N + 1) + '\n0000000000 65535 f \n');
+    for (var k = 1; k <= N; k++) push(String(offs[k]).padStart(10, '0') + ' 00000 n \n');
+    push('trailer\n<< /Size ' + (N + 1) + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF');
+    return new Blob(chunks, { type: 'application/pdf' });
+  }
+  async function savePdf() {
+    var btn = $('#pdfBtn'), msg = $('#pdfMsg');
+    if (!lastRender || !btn) return;
+    var label = btn.textContent; btn.disabled = true; btn.textContent = 'PDF 만드는 중…'; msg.textContent = '';
+    try {
+      var P = lastRender.P, jpegs = [];
+      for (var i = 0; i < lastRender.pages.length; i++) jpegs.push(await pageToJpeg(lastRender.pages[i], P));
+      var blob = buildPdf(jpegs, P.PW * 72 / 25.4, P.PH * 72 / 25.4);
+      var name = ((lastRender.title || '문중') + '_세계도.pdf').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, '_');
+      if (FRAMED && DL) {
+        await DL.save({ filename: name, data: blob });
+        msg.textContent = 'PDF 파일을 저장했어요. 저장된 파일을 열어 인쇄하세요.';
+      } else {
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 20000);
+        msg.textContent = 'PDF 파일을 저장했어요. 내려받은 파일(다운로드 폴더)을 확인하세요.';
+      }
+    } catch (e) {
+      msg.textContent = (e && e.code === 'declined') ? '저장을 취소했어요.' :
+        (FRAMED ? 'PDF를 저장하지 못했어요. 잠시 뒤 다시 눌러 보세요.' : 'PDF를 만들지 못했어요. ‘인쇄하기’를 눌러 인쇄 창에서 ‘PDF로 저장’을 고르세요.');
+    }
+    btn.disabled = false; btn.textContent = label;
+  }
+
+  function renderSheets() {
+    var box = $('#sheets'), status = $('#status'), pr = $('#printRow');
+    var L = computeLayout();
+    if (!L) {
+      box.innerHTML = VIEWONLY ? '<div class="placeholder">' + (SHARED && !remoteReady ? '불러오는 중이에요…' : '자료 파일(문중_자료.js)이 없어요.<br>관리자용 파일에서 만든 문중_자료.js를 이 파일과 같은 폴더에 넣고 새로고침하세요.') + '</div>'
+        : '<div class="placeholder">인물을 입력하면 여기에 세계도가 나타나요.<br>왼쪽 위 ‘맨 위 인물 추가’를 눌러 시작하세요.</div>';
+      status.innerHTML = ''; pr.innerHTML = ''; return;
+    }
+    var P = plan(L), pages = [];
+    P.off = L.strip.length ? 1 : 0;
+    if (P.off) pages.push(summaryPageSvg(L, P));
+    for (var ti = 0; ti < P.tiles.length; ti++) pages.push(pageSvg(L, P, ti));
+    lastRender = { pages: pages, P: P, title: (state.settings.title || '').trim() };
+    box.innerHTML = pages.map(function (p) { return '<div class="sheet' + (P.o === 'P' ? ' p' : '') + '" style="--w:' + P.PW + 'mm;--h:' + P.PH + 'mm">' + p + '</div>'; }).join('');
+    $('#pagestyle').textContent = '@page{size:A4 ' + (P.o === 'L' ? 'landscape' : 'portrait') + ';margin:0}';
+
+    var ptv = FS * P.s * 72 / 25.4, msg = '';
+    if (!L.jok && ptv < 6) msg = '글자가 작아서 읽기 어려울 수 있어요. ' + (state.settings.np === '2' ? '' : '2장으로 바꾸거나 ') + '‘출력 시작 인물’이나 ‘몇 세까지 보일까요?’로 범위를 줄여 보세요.';
+    status.innerHTML =
+      '<span class="chip">A4 ' + (P.o === 'L' ? '가로' : '세로') + '</span>' +
+      '<span class="chip">' + (L.jok ? '족보 ' : '세계도 ') + (P.pages + P.off) + '장' + (P.off ? ' (윗대 요약 1장 포함)' : '') + '</span>' +
+      '<span class="chip' + (!L.jok && ptv < 6 ? ' warn' : '') + '">이름 글자 ' + (L.jok ? '11pt' : '약 ' + ptv.toFixed(1) + 'pt') + '</span>' +
+      '<span class="chip">' + L.nodes.length + '명 · ' + L.gen0 + '~' + (L.gen0 + L.rows - 1) + '세</span>' +
+      (msg ? '<p class="msg warn">' + esc(msg) + '</p>' : '');
+
+    if (FRAMED && DL) {
+      pr.innerHTML = '<button type="button" class="btn primary" id="pdfBtn">PDF 파일로 저장</button>' +
+        '<p>A4 PDF 파일로 저장돼요. 인쇄는 저장한 PDF를 열어서 하세요(이 화면에서는 바로 인쇄가 막혀 있어요).</p><p id="pdfMsg" role="status"></p>';
+      $('#pdfBtn').addEventListener('click', savePdf);
+    } else if (FRAMED) {
+      pr.innerHTML = '<p>이 화면에서는 인쇄와 파일 저장이 막혀 있어요. 채팅으로 함께 보내드린 <b>문중세계도.html</b> 파일을 열면 ‘PDF 파일로 저장’과 ‘인쇄하기’ 버튼이 켜져요.</p>';
+    } else {
+      pr.innerHTML = '<button type="button" class="btn primary" id="pdfBtn">PDF 파일로 저장</button>' +
+        '<button type="button" class="btn" id="printBtn">인쇄하기</button>' +
+        '<p>‘PDF 파일로 저장’은 A4 크기 PDF를 바로 내려받아요. ‘인쇄하기’는 프린터 인쇄 창이 열려요(배율 100%).</p><p id="pdfMsg" role="status"></p>';
+      $('#pdfBtn').addEventListener('click', savePdf);
+      $('#printBtn').addEventListener('click', function () { window.print(); });
+    }
+  }
+
+  /* ---------- 입력 화면 ---------- */
+  function renderOutline() {
+    state._idx = indexAll();
+    var st = state.settings, rows = [], count = 0;
+    (function w(a, d) {
+      a.forEach(function (n) {
+        count++;
+        rows.push('<button type="button" class="row" data-id="' + n.id + '" style="--d:' + Math.min(d, 40) + '" aria-pressed="' + (n.id === state.sel) + '">' +
+          '<span class="nm">' + esc(n.name.trim() || '(이름 없음)') + '</span>' +
+          (n.hanja ? '<span class="hj">' + esc(n.hanja) + '</span>' : '') +
+          (n.sex === 'F' ? '<span class="tag">딸</span>' : '') +
+          '<span class="gn">' + (st.baseGen + d) + '세</span></button>');
+        w(n.kids, d + 1);
+      });
+    })(state.roots, 0);
+    $('#outline').innerHTML = rows.length ? rows.join('') : '<div class="empty">아직 인물이 없어요. ‘맨 위 인물 추가’를 눌러 시조(또는 기준이 되는 분)부터 입력하세요.</div>';
+    $('#count').textContent = count ? '· ' + count + '명' : '';
+    renderResults();
+  }
+  function renderStart() {
+    var st = state.settings, sel = $('#sStart'), opts = ['<option value="0">처음부터 (전체)</option>'];
+    if (st.startId && !state._idx.get(st.startId)) st.startId = 0;
+    (function w(a, d) {
+      a.forEach(function (n) {
+        var label = '　'.repeat(Math.min(d, 8)) + (n.name.trim() || '(이름 없음)') + ' · ' + (st.baseGen + d) + '세';
+        opts.push('<option value="' + n.id + '"' + (n.id === st.startId ? ' selected' : '') + '>' + esc(label) + '</option>');
+        w(n.kids, d + 1);
+      });
+    })(state.roots, 0);
+    sel.innerHTML = opts.join('');
+    sel.value = String(st.startId || 0);
+  }
+  function renderResults() {
+    var q = $('#qName').value.trim(), g = parseInt($('#qGen').value, 10) || 0, box = $('#results');
+    if (!q && !g) { box.hidden = true; box.innerHTML = ''; return; }
+    var base = state.settings.baseGen, found = [];
+    state._idx.forEach(function (info) {
+      var n = info.n, gen = base + info.d;
+      if (g && gen !== g) return;
+      if (q && n.name.indexOf(q) < 0 && n.hanja.indexOf(q) < 0) return;
+      found.push({ info: info, gen: gen });
+    });
+    box.hidden = false;
+    if (!found.length) { box.innerHTML = '<p class="rc" style="margin:0">찾는 분이 없어요. 글자를 줄이거나 세를 비워 보세요.</p>'; return; }
+    var shown = found.slice(0, 60);
+    box.innerHTML = '<p class="rc">검색 결과 ' + found.length + '명' + (found.length > 60 ? ' (앞의 60명만 보여요)' : '') + '</p><div class="rl">' +
+      shown.map(function (f) {
+        var n = f.info.n, par = f.info.parent;
+        return '<div class="res"><button type="button" class="pick" data-id="' + n.id + '"><b>' + esc(n.name.trim() || '(이름 없음)') + '</b>' +
+          (n.hanja ? '<span class="hj">' + esc(n.hanja) + '</span>' : '') +
+          '<span class="sub">' + f.gen + '세' + (n.sex === 'F' ? ' · 딸' : '') + (par ? ' · 아버지 ' + esc(par.name.trim() || '(이름 없음)') : '') + '</span></button>' +
+          '<button type="button" class="btn go" data-start="' + n.id + '">여기부터 출력</button></div>';
+      }).join('') + '</div>';
+  }
+  function renderForm() {
+    var info = state._idx.get(state.sel);
+    $('#form').hidden = !info; $('#noSel').hidden = !!info;
+    if (!info) { $('#genTag').textContent = ''; return; }
+    var n = info.n;
+    $('#fName').value = n.name; $('#fHanja').value = n.hanja; $('#fBirth').value = n.birth; $('#fDeath').value = n.death; $('#fMemo').value = n.memo;
+    document.querySelectorAll('input[name="sex"]').forEach(function (r) { r.checked = r.value === n.sex; });
+    $('#genTag').textContent = '· ' + (state.settings.baseGen + info.d) + '세';
+  }
+  function syncSettingsUI() {
+    var st = state.settings;
+    $('#sTitle').value = st.title; $('#sBase').value = st.baseGen; $('#sDepth').value = st.depth || '';
+    $('#sShowF').checked = !!st.showF;
+    document.querySelectorAll('input[name="kind"]').forEach(function (r) { r.checked = r.value === st.kind; });
+    document.querySelectorAll('input[name="nm"]').forEach(function (r) { r.checked = r.value === st.nameMode; });
+    document.querySelectorAll('input[name="sp"]').forEach(function (r) { r.checked = r.value === st.np; });
+    $('#sTop').checked = !!st.top; $('#sTopN').value = st.topN || '';
+    document.querySelectorAll('input[name="orient"]').forEach(function (r) { r.checked = r.value === st.orient; });
+    $('#sampleBar').hidden = !state.sample;
+  }
+  function renderAll() {
+    renderOutline(); renderStart(); renderForm(); renderSheets(); $('#sampleBar').hidden = !state.sample; save();
+  }
+  var raf = 0;
+  function later() {
+    if (raf) return;
+    raf = requestAnimationFrame(function () { raf = 0; renderOutline(); renderStart(); renderSheets(); save(); });
+  }
+  function resetDel() { var b = $('#bDel'); if (b._reset) b._reset(); }
+  function select(id, focusName) {
+    var hadFocus = document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('row');
+    state.sel = id; renderOutline(); renderForm(); resetDel();
+    if (hadFocus) { var el = document.querySelector('.row[aria-pressed="true"]'); if (el) el.focus(); }
+    if (focusName) { $('#fName').focus(); $('#fName').select(); }
+  }
+  function twoStep(btn, armedText, action) {
+    var orig = btn.textContent;
+    btn._reset = function () { clearTimeout(btn._t); btn.dataset.armed = ''; btn.textContent = orig; };
+    btn.addEventListener('click', function () {
+      if (btn.dataset.armed) { btn._reset(); action(); }
+      else { btn.dataset.armed = '1'; btn.textContent = armedText(); btn._t = setTimeout(btn._reset, 4000); }
+    });
+  }
+
+  /* ---------- 이벤트 ---------- */
+  $('#outline').addEventListener('click', function (e) {
+    var b = e.target.closest('.row'); if (b) select(Number(b.dataset.id), false);
+  });
+  $('#qName').addEventListener('input', renderResults);
+  $('#qGen').addEventListener('input', renderResults);
+  $('#results').addEventListener('click', function (e) {
+    var go = e.target.closest('[data-start]'), pick = e.target.closest('.pick');
+    if (go) {
+      state.settings.startId = Number(go.dataset.start); renderStart(); renderSheets(); save();
+      go.textContent = '지정했어요';
+    } else if (pick) {
+      select(Number(pick.dataset.id), false);
+      var row = document.querySelector('.row[aria-pressed="true"]');
+      if (row) row.scrollIntoView({ block: 'nearest' });
+    }
+  });
+  $('#addRoot').addEventListener('click', function () {
+    var n = mkNode('새인물'); state.roots.push(n); state.sel = n.id; renderAll(); $('#fName').focus(); $('#fName').select();
+  });
+  $('#bChild').addEventListener('click', function () {
+    var info = state._idx.get(state.sel); if (!info) return;
+    var n = mkNode('새인물'); info.n.kids.push(n); state.sel = n.id; renderAll(); $('#fName').focus(); $('#fName').select();
+  });
+  $('#bSib').addEventListener('click', function () {
+    var info = state._idx.get(state.sel); if (!info) return;
+    var n = mkNode('새인물'); info.arr.splice(info.i + 1, 0, n); state.sel = n.id; renderAll(); $('#fName').focus(); $('#fName').select();
+  });
+  function move(dir) {
+    var info = state._idx.get(state.sel); if (!info) return;
+    var j = info.i + dir; if (j < 0 || j >= info.arr.length) return;
+    var t = info.arr[j]; info.arr[j] = info.arr[info.i]; info.arr[info.i] = t; renderAll();
+  }
+  $('#bUp').addEventListener('click', function () { move(-1); });
+  $('#bDown').addEventListener('click', function () { move(1); });
+  twoStep($('#bDel'), function () {
+    var info = state._idx.get(state.sel), c = info ? countAll(info.n) - 1 : 0;
+    return c > 0 ? '한 번 더 누르면 삭제 (아래 ' + c + '명 포함)' : '한 번 더 누르면 삭제';
+  }, function () {
+    var info = state._idx.get(state.sel); if (!info) return;
+    info.arr.splice(info.i, 1);
+    state.sel = info.parent ? info.parent.id : (state.roots[0] ? state.roots[0].id : 0);
+    renderAll();
+  });
+
+  function bindField(id, key) {
+    $(id).addEventListener('input', function (e) {
+      var info = state._idx.get(state.sel); if (!info) return;
+      var v = e.target.value; if (key === 'birth' || key === 'death') v = v.replace(/\D/g, '');
+      info.n[key] = v; later();
+    });
+  }
+  bindField('#fName', 'name'); bindField('#fHanja', 'hanja'); bindField('#fBirth', 'birth'); bindField('#fDeath', 'death'); bindField('#fMemo', 'memo');
+  document.querySelectorAll('input[name="sex"]').forEach(function (r) {
+    r.addEventListener('change', function () { var info = state._idx.get(state.sel); if (info) { info.n.sex = r.value; later(); } });
+  });
+
+  function settingsChanged() { renderOutline(); renderStart(); renderForm(); renderSheets(); save(); }
+  $('#sTitle').addEventListener('input', function (e) { state.settings.title = e.target.value; renderSheets(); save(); });
+  $('#sBase').addEventListener('input', function (e) { var v = parseInt(e.target.value, 10); if (v >= 1) { state.settings.baseGen = v; settingsChanged(); } });
+  $('#sStart').addEventListener('change', function (e) { state.settings.startId = Number(e.target.value) || 0; renderSheets(); save(); });
+  $('#sDepth').addEventListener('input', function (e) { var v = parseInt(e.target.value, 10); state.settings.depth = v >= 1 ? v : 0; renderSheets(); save(); });
+  $('#sShowF').addEventListener('change', function (e) { state.settings.showF = e.target.checked; renderSheets(); save(); });
+  $('#sTop').addEventListener('change', function (e) { state.settings.top = e.target.checked; renderSheets(); save(); });
+  $('#sTopN').addEventListener('input', function (e) { var v = parseInt(e.target.value, 10); state.settings.topN = v >= 1 ? v : 0; renderSheets(); save(); });
+  document.querySelectorAll('input[name="kind"]').forEach(function (r) { r.addEventListener('change', function () { state.settings.kind = r.value; renderSheets(); save(); }); });
+  document.querySelectorAll('input[name="nm"]').forEach(function (r) { r.addEventListener('change', function () { state.settings.nameMode = r.value; renderSheets(); save(); }); });
+  document.querySelectorAll('input[name="sp"]').forEach(function (r) { r.addEventListener('change', function () { state.settings.np = r.value; renderSheets(); save(); }); });
+  document.querySelectorAll('input[name="orient"]').forEach(function (r) { r.addEventListener('change', function () { state.settings.orient = r.value; renderSheets(); save(); }); });
+
+  $('#bView').addEventListener('click', function () { $('#bText').value = toText(); $('#bMsg').textContent = '현재 목록을 글로 바꿔 보여드렸어요. 고친 뒤 ‘이 글로 바꾸기’를 누르세요.'; });
+  twoStep($('#bApply'), function () { return '한 번 더 누르면 현재 인물이 모두 바뀌어요'; }, function () {
+    var roots = parseText($('#bText').value);
+    if (!roots.length) { $('#bMsg').textContent = '읽을 수 있는 인물이 없어요. 위 예시처럼 한 줄에 한 명씩 입력하세요.'; return; }
+    state.roots = roots; state.sample = false; state.sel = roots[0].id; state.settings.startId = 0;
+    if (parseText.meta.title !== undefined) state.settings.title = parseText.meta.title;
+    if (parseText.meta.baseGen) state.settings.baseGen = parseText.meta.baseGen;
+    syncSettingsUI(); renderAll(); $('#bMsg').textContent = '인물 ' + (function c(a) { return a.reduce(function (s, n) { return s + 1 + c(n.kids); }, 0); })(roots) + '명을 적용했어요.';
+  });
+  $('#bCopy').addEventListener('click', function () {
+    var ta = $('#bText'); if (!ta.value) ta.value = toText();
+    var fallback = function () { ta.focus(); ta.select(); $('#bMsg').textContent = '글을 선택했어요. 길게 누르거나 Ctrl+C로 복사하세요.'; };
+    try { navigator.clipboard.writeText(ta.value).then(function () { $('#bMsg').textContent = '복사했어요.'; }, fallback); } catch (e) { fallback(); }
+  });
+
+  $('#bSaveFile').addEventListener('click', async function () {
+    var text = toText(), name = ((state.settings.title || '문중').trim().replace(/[\\/:*?"<>|]/g, '') || '문중').replace(/\s+/g, '_') + '_자료.txt';
+    try {
+      if (typeof DL !== 'undefined' && DL && FRAMED) { await DL.save({ filename: name, data: text }); $('#bMsg').textContent = '자료 파일을 저장했어요.'; }
+      else {
+        var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' })); a.download = name;
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 20000);
+        $('#bMsg').textContent = '자료 파일을 내려받았어요. (' + name + ')';
+      }
+    } catch (e) { $('#bMsg').textContent = (e && e.code === 'declined') ? '저장을 취소했어요.' : '파일로 저장하지 못했어요. 위의 ‘복사’를 쓰세요.'; }
+  });
+  $('#bLoadFile').addEventListener('click', function () { $('#bFile').click(); });
+  $('#bFile').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { $('#bText').value = String(r.result || ''); $('#bMsg').textContent = '파일을 불러왔어요. 내용을 확인하고 ‘이 글로 바꾸기’를 두 번 누르면 적용돼요.'; };
+    r.onerror = function () { $('#bMsg').textContent = '파일을 읽지 못했어요. 글을 붙여넣어 주세요.'; };
+    r.readAsText(f, 'utf-8'); e.target.value = '';
+  });
+
+  twoStep($('#sampleClear'), function () { return '한 번 더 누르면 예시가 지워져요'; }, function () {
+    state.roots = []; state.sample = false; state.sel = 0; state.settings.startId = 0; state.settings.title = ''; state.settings.depth = 0;
+    syncSettingsUI(); renderAll();
+  });
+  $('#sampleKeep').addEventListener('click', function () { state.sample = false; $('#sampleBar').hidden = true; save(); });
+
+
+  /* ---------- 게시판(여러 사람이 함께 보는 화면): 자료는 서버에, 고치기는 관리자만 ---------- */
+  var DB = null, saveTimer = 0, saving = false, again = false, lastSaved = '', saveNote = '';
+  var CH = 50000;   /* 한 묶음에 담는 글자 수 (문서 하나의 크기 제한 때문에 나눠 저장해요) */
+  function setModeBar(t) { var el = $('#modeBar'); if (el) { el.textContent = t; el.hidden = !t; } }
+  function modeText() {
+    if (!remoteReady) return '불러오는 중이에요…';
+    return isAdmin ? '관리자 모드 — 입력·수정한 내용은 자동으로 저장되고, 보기 전용으로 들어온 분들 화면에도 나타나요.' + (saveNote ? ' · ' + saveNote : '')
+                   : '보기 전용 — 인물 찾기와 PDF 저장만 할 수 있어요. 내용은 관리자만 바꿀 수 있어요.';
+  }
+  function scheduleRemote() {
+    if (!SHARED || !isAdmin || !DB || !remoteReady) return;
+    if (state.sample || toText() === lastSaved) return;
+    saveNote = '저장 대기…'; setModeBar(modeText());
+    clearTimeout(saveTimer); saveTimer = setTimeout(function () { saveTimer = 0; pushRemote(); }, 1200);
+  }
+  async function pushRemote() {
+    if (saving) { again = true; return; }
+    var text = toText(); if (text === lastSaved) { saveNote = '저장됨'; setModeBar(modeText()); return; }
+    saving = true; saveNote = '저장 중…'; setModeBar(modeText());
+    try {
+      var lines = text.split('\n'), chunks = [], cur = '';
+      lines.forEach(function (ln) { if (cur && cur.length + ln.length + 1 > CH) { chunks.push(cur); cur = ''; } cur += (cur ? '\n' : '') + ln; });
+      if (cur || !chunks.length) chunks.push(cur);
+      var rev = Date.now().toString(36), col = DB.collection('clan');
+      var prev = await col.doc('meta').get(), oldN = prev.exists ? (prev.data().n || 0) : 0;
+      for (var i = 0; i < chunks.length; i++) await col.doc('c' + String(i).padStart(3, '0')).set({ rev: rev, text: chunks[i] });
+      await col.doc('meta').set({ n: chunks.length, rev: rev, updated: new Date().toISOString() });
+      for (var j = chunks.length; j < oldN; j++) await col.doc('c' + String(j).padStart(3, '0')).delete();
+      lastSaved = text; saveNote = '저장됨';
+    } catch (e) {
+      saveNote = '저장하지 못했어요 (' + ((e && e.code) || '오류') + ') — 잠시 뒤 다시 고쳐 보세요';
+    }
+    saving = false; setModeBar(modeText());
+    if (again) { again = false; scheduleRemote(); }
+  }
+  function onRemote(snap) {
+    var meta = null, parts = {};
+    snap.docs.forEach(function (d) { if (d.id === 'meta') meta = d.data(); else parts[d.id] = d.data(); });
+    if (!remoteReady) { remoteReady = true; }
+    if (!meta) {   /* 아직 올라온 자료가 없어요 */
+      if (isAdmin && !state.roots.length && !state.sample) { state.roots = parseText(SAMPLE); uid = maxId(state.roots) + 1; state.sample = true; state._idx = indexAll(); state.sel = state.roots[0].id; syncSettingsUI(); renderAll(); }
+      renderSheets(); setModeBar(modeText()); return;
+    }
+    var texts = [];
+    for (var i = 0; i < meta.n; i++) { var c = parts['c' + String(i).padStart(3, '0')]; if (!c || c.rev !== meta.rev) { setModeBar(modeText()); return; } texts.push(c.text); }
+    var text = texts.join('\n');
+    if (isAdmin && (saveTimer || saving)) return;      /* 내가 고치는 중이면 덮어쓰지 않아요 */
+    if (text === lastSaved && state.roots.length) { setModeBar(modeText()); return; }
+    state.roots = parseText(text); uid = maxId(state.roots) + 1; state.sample = false;
+    if (parseText.meta.title !== undefined) state.settings.title = parseText.meta.title;
+    if (parseText.meta.baseGen) state.settings.baseGen = parseText.meta.baseGen;
+    state._idx = indexAll();
+    if (!state._idx.get(state.sel)) state.sel = state.roots[0] ? state.roots[0].id : 0;
+    lastSaved = toText();
+    syncSettingsUI(); renderOutline(); renderStart(); renderForm(); renderSheets(); $('#sampleBar').hidden = true;
+    setModeBar(modeText());
+  }
+  async function initShared() {
+    try {
+      var user = await window.claude.use('user');
+      isAdmin = user ? !!(await user.canEdit()) : false;
+      DB = await window.claude.use('db');
+    } catch (e) { DB = null; }
+    if (!DB) { remoteReady = true; setModeBar('자료를 불러오지 못했어요. claude.ai에 로그인한 상태에서 다시 열어 보세요.'); renderSheets(); return; }
+    if (isAdmin) { VIEWONLY = false; document.documentElement.classList.remove('viewonly'); }
+    DB.collection('clan').onSnapshot(onRemote, function () { setModeBar('자료를 불러오지 못했어요. 새로고침해 보세요.'); });
+  }
+
+
+  /* ---------- 자료 파일(문중_자료.js): 관리자용이 쓰고, 보기용이 읽어요 ---------- */
+  function dataJs() { return '/* 문중 세계도 자료 파일 - 관리자용 파일이 만들어요. 직접 고치지 마세요. */\nwindow.MUNJUNG_SAVED = ' + JSON.stringify(new Date().toLocaleString('ko-KR')) + ';\nwindow.MUNJUNG_DATA = ' + JSON.stringify(toText()) + ';\n'; }
+  function applyDataText(t) {
+    state.roots = parseText(t); uid = maxId(state.roots) + 1; state.sample = false;
+    if (parseText.meta.title !== undefined) state.settings.title = parseText.meta.title;
+    if (parseText.meta.baseGen) state.settings.baseGen = parseText.meta.baseGen;
+  }
+  function loadFromDataFile() {
+    var t = window.MUNJUNG_DATA;
+    if (typeof t !== 'string' || !t.trim()) return false;
+    applyDataText(t); return true;
+  }
+
+
+  var viewLast = typeof window.MUNJUNG_DATA === 'string' ? window.MUNJUNG_DATA : null;
+  var curSaved = window.MUNJUNG_SAVED || '', curSrc = 'folder', VH = null, VHneed = false, lastCheck = '', problem = '';
+  function folderOfThisFile() { try { var u = decodeURIComponent(location.href.split('?')[0].split('#')[0]); return u.slice(0, u.lastIndexOf('/') + 1).replace('file:///', ''); } catch (e) { return ''; } }
+  function viewInfo() {
+    var e = $('#viewInfo'); if (!e) return;
+    var where = curSrc === 'picked' ? '직접 고른 파일(' + (VH ? VH.name : '') + ')' : '이 파일과 같은 폴더의 문중_자료.js [' + folderOfThisFile() + ']';
+    e.textContent = problem ? problem : '읽는 자료: ' + where + ' · 자료 저장 시각: ' + (curSaved || '알 수 없음') + ' · 마지막 확인 ' + lastCheck;
+  }
+  function incoming(t, saved) {
+    curSaved = saved || ''; lastCheck = new Date().toLocaleTimeString('ko-KR'); problem = '';
+    if (t !== viewLast) {
+      viewLast = t; applyDataText(t); state._idx = indexAll();
+      if (!state._idx.get(state.sel)) state.sel = state.roots[0] ? state.roots[0].id : 0;
+      syncSettingsUI(); renderOutline(); renderStart(); renderForm(); renderSheets();
+    }
+    viewInfo();
+  }
+  function parseDataJs(txt) {
+    var m = txt.match(/window\.MUNJUNG_DATA\s*=\s*("(?:[^"\\]|\\.)*")\s*;/), sv = txt.match(/window\.MUNJUNG_SAVED\s*=\s*("(?:[^"\\]|\\.)*")\s*;/);
+    if (!m) return null; return { data: JSON.parse(m[1]), saved: sv ? JSON.parse(sv[1]) : '' };
+  }
+  function idb(mode, fn) {
+    return new Promise(function (res, rej) {
+      var o = indexedDB.open('munjung-fs-view', 1);
+      o.onupgradeneeded = function () { o.result.createObjectStore('h'); };
+      o.onerror = function () { rej(o.error); };
+      o.onsuccess = function () { var tx, r; try { tx = o.result.transaction('h', mode); r = fn(tx.objectStore('h')); } catch (e) { rej(e); return; } tx.oncomplete = function () { res(r && r.result); }; tx.onerror = function () { rej(tx.error); }; };
+    });
+  }
+  async function pullHandle() {
+    try {
+      if ((await VH.queryPermission({ mode: 'read' })) !== 'granted') { VHneed = true; $('#vPick').textContent = '자료 파일 다시 허용하기'; problem = '직접 고른 자료 파일을 읽으려면 “자료 파일 다시 허용하기”를 눌러 허용하세요.'; viewInfo(); return false; }
+      var p = parseDataJs(await (await VH.getFile()).text());
+      if (!p) { problem = '고른 파일에서 자료를 찾지 못했어요. 관리자용에서 만든 문중_자료.js를 고르세요.'; viewInfo(); return false; }
+      curSrc = 'picked'; incoming(p.data, p.saved); return true;
+    } catch (e) { problem = '고른 자료 파일을 읽지 못했어요. 다시 골라 주세요.'; viewInfo(); return false; }
+  }
+  function pullData() {
+    if (VH && curSrc === 'picked' && !VHneed) { pullHandle(); return; }
+    if (VH && VHneed) return;
+    var sc = document.createElement('script'); sc.src = '문중_자료.js?t=' + Date.now();
+    sc.onload = function () { sc.remove(); var t = window.MUNJUNG_DATA; if (typeof t === 'string') { curSrc = 'folder'; incoming(t, window.MUNJUNG_SAVED); } else { problem = '문중_자료.js를 읽지 못했어요.'; viewInfo(); } };
+    sc.onerror = function () { sc.remove(); problem = '자료 파일(문중_자료.js)을 읽지 못했어요. 이 파일과 같은 폴더에 있는지 확인하거나 “자료 파일 직접 고르기”를 누르세요.'; viewInfo(); };
+    document.head.appendChild(sc);
+  }
+  var pickBtn = $('#vPick');
+  if (!window.showOpenFilePicker) { if (pickBtn) pickBtn.hidden = true; }
+  else {
+    pickBtn.addEventListener('click', async function () {
+      try {
+        if (VH && VHneed) { var pm = await VH.requestPermission({ mode: 'read' }); if (pm === 'granted') { VHneed = false; pickBtn.textContent = '자료 파일 직접 고르기'; curSrc = 'picked'; await pullHandle(); } return; }
+        var hs = await window.showOpenFilePicker({ types: [{ description: '문중 자료 파일', accept: { 'text/javascript': ['.js'] } }], multiple: false });
+        VH = hs[0]; VHneed = false; try { await idb('readwrite', function (st) { return st.put(VH, 'handle'); }); } catch (e) { /* 기억 못 해도 돼요 */ }
+        curSrc = 'picked'; await pullHandle();
+      } catch (e) { /* 취소 */ }
+    });
+    idb('readonly', function (st) { return st.get('handle'); }).then(function (h) { if (h) { VH = h; curSrc = 'picked'; pullHandle(); } }, function () {});
+  }
+  lastCheck = new Date().toLocaleTimeString('ko-KR'); viewInfo();
+  setInterval(pullData, 5000);
+
+  /* ---------- 시작 ---------- */
+  if (!load()) {
+    if (!SHARED) { state.roots = parseText(SAMPLE); uid = maxId(state.roots) + 1; }
+    else { state.roots = []; state.sample = false; }
+  }
+  state._idx = indexAll();
+  state.sel = state.roots[0] ? state.roots[0].id : 0;
+  syncSettingsUI();
+  if (VIEWONLY) document.documentElement.classList.add('viewonly');
+  if (SHARED) { VIEWONLY = true; document.documentElement.classList.add('viewonly'); setModeBar('불러오는 중이에요…'); }
+  renderAll();
+  if (SHARED) initShared();
+})();
+</script>
+
+</html>
